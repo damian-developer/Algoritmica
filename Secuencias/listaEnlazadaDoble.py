@@ -1,55 +1,54 @@
-class _listaEnlazadaDoble:
+class _DoublyLinkedBase:
+    """Una base de clase que implementa una lista enlazada doble."""
 
-    class _Nodo:
-        def __init__(self, elemento, previo, siguiente):
-            self._elemento = elemento
-            self._previo = previo
-            self._siguiente = siguiente
+    class _Node:
+        """Nodo ligado a otros nodos con referencias a los nodos previos y siguientes."""
+
+        def __init__(self, element, prev, next):
+            self._element = element
+            self._prev = prev
+            self._next = next
+
+        def __str__(self):
+            return str(self._element)
+            
     
     def __init__(self):
-        self._header = self._Nodo(None,None,None)
-        self._trailer = self._Nodo(None,None,None)
-        self._header._siguiente = self._trailer
-        self._trailer._previo = self._header
-        self._tamaño = 0
+        """Crea una lista enlazada doble vacía."""
+        self._header = self._Node(None, None, None)
+        self._trailer = self._Node(None, None, None)
+        self._header._next = self._trailer
+        self._trailer._prev = self._header
+        self._size = 0
 
-    def _insertar(self, elemento, predecesor, sucesor):
-        nuevo = self._Nodo(elemento, predecesor, sucesor)
-        predecesor._siguiente = nuevo
-        sucesor._previo = nuevo
-        self._tamaño += 1
-        return nuevo
+    def __len__(self):
+        """Devuelve el número de elementos en la lista enlazada doble."""
+        return self._size
 
-    def _insertar_posicion(self, posicion, elemento):
-        if posicion < 0 or posicion > self._tamaño:
-            raise IndexError("Posición inválida")
+    def is_empty(self):
+        """Devuelve True si la lista enlazada doble está vacía."""
+        return self._size == 0
 
-        if posicion == self._tamaño:
-            self._insertar(elemento, self._trailer._previo, self._trailer)
-        else:
-            actual = self._header._siguiente
-            for _ in range(posicion):
-                actual = actual._siguiente
-                self._insertar(elemento, actual._previo, actual)
+    def _insert_between(self, e, predecessor, successor):
+        """Añade un elemento entre dos nodos existentes y devuelve el nuevo nodo."""
+        newest = self._Node(e, predecessor, successor)
+        predecessor._next = newest
+        successor._prev = newest
+        self._size += 1
+        return newest
 
-    def _imprimir(self):
-        actual = self._header._siguiente
-        while actual != self._trailer:
-            print(actual._elemento, end=" <-> ") 
-            actual = actual._siguiente
-        print("None")
-    
-    def _borrar_elemento(self, nodo):
-        predecesor = nodo._previo
-        sucesor = nodo._siguiente
-        predecesor._siguiente = sucesor
-        sucesor._previo = predecesor
-        self._tamaño -= 1
+    def _delete_node(self, node):
+        """Elimina un nodo de la lista y devuelve su elemento."""
+        predecessor = node._prev
+        successor = node._next
+        predecessor._next = successor
+        successor._prev = predecessor
+        self._size -= 1
+        element = node._element
+        node._prev = node._next = node._element = None
+        return element
 
-        elemento = nodo._elemento
-        nodo._previo = nodo._siguiente = nodo._elemento = None
-        return elemento
-
+    ##adaptar
     def _busca_nodo(self, posicion):
         if posicion < 0 or posicion > self._tamaño:
             raise IndexError("Posición inválida")
@@ -57,20 +56,4 @@ class _listaEnlazadaDoble:
         actual = self._header._siguiente
         for _ in range(posicion):
             actual = actual._siguiente
-        self._borrar_elemento(actual)      
-
-
-class miListaEnlazadaDoble(_listaEnlazadaDoble):
-    pass
-
-
-lista = miListaEnlazadaDoble()
-lista._insertar(1, lista._header, lista._trailer)
-lista._insertar(3, lista._trailer._previo, lista._trailer)
-lista._imprimir()
-
-lista._insertar_posicion(1,2)
-lista._imprimir()
-
-lista._busca_nodo(1)
-lista._imprimir()
+        self._borrar_elemento(actual)
