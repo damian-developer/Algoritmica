@@ -130,6 +130,12 @@ class Edge:
         self.v = v
         self.element = element
         self.directed = directed
+
+    def opposite(self, v):
+        if v is self.u:
+            return self.v
+        else:
+            return self.u
     
     def __str__(self):
         if self.directed:
@@ -218,20 +224,79 @@ class ADTGraph:
     def remove_edge():
         pass
 
+    def dfs(self, u):
+        discovered = {}
+        self._dfs(u, discovered)
+        return discovered
+
+    def _dfs(self, u, discovered):
+        #print(f"Estas en el vertice {u}")
+        for e in self.incident_edges(u):
+            v = e.opposite(u)
+            if v not in discovered:
+                discovered[v] = e
+                self._dfs(v, discovered)
+    
+    def bfs(self, u):
+        discovered = {u: None}
+        self._bfs(u, discovered)
+        return discovered
+
+    def _bfs(self, u, discovered):
+        level = [u]
+        while len(level) > 0:
+            next_level = []
+            for u in level:
+                for e in self.incident_edges(u):
+                    v = e.opposite(u)
+                    if v not in discovered:
+                        discovered[v] = e
+                        next_level.append(v)
+            level = next_level
+    
+    def dijkstra(self):
+        pass
+                    
+
 grafo = ADTGraph(directed=True)
 
-v1 = grafo.insert_vertex("A")
-v2 = grafo.insert_vertex("B")
-v3 = grafo.insert_vertex("C")
-v4 = grafo.insert_vertex("D")
-v5 = grafo.insert_vertex("E")
-v6 = grafo.insert_vertex("F")
+v1 = grafo.insert_vertex("Nueva York")
+v2 = grafo.insert_vertex("Los Angeles")
+v3 = grafo.insert_vertex("San Francisco")
+v4 = grafo.insert_vertex("Seattle")
+v5 = grafo.insert_vertex("Denver")
+v6 = grafo.insert_vertex("Las Vegas")
+v7 = grafo.insert_vertex("Chicago")
+v8 = grafo.insert_vertex("Washington DC")
 
 grafo.insert_edge(v1, v2, "Arista 1")
-grafo.insert_edge(v2, v3, "Arista 2")
-grafo.insert_edge(v3, v1, "Arista 3")
-grafo.insert_edge(v4, v5, "Arista 4")
-grafo.insert_edge(v5, v6, "Arista 5")
+grafo.insert_edge(v2, v6, "Arista 2")
+grafo.insert_edge(v2, v3, "Arista 3")
+grafo.insert_edge(v3, v4, "Arista 4")
+grafo.insert_edge(v4, v5, "Arista 5")
+grafo.insert_edge(v4, v6, "Arista 6")
+grafo.insert_edge(v5, v7, "Arista 7")
+grafo.insert_edge(v5, v8, "Arista 8")
+grafo.insert_edge(v7, v4, "Arista 9")
+
+
+print(f"\n")
+print(f"Recorrido DFS desde el vertice {v1}")
+for vertex, edge in grafo.dfs(v1).items():
+    if edge is not None:
+        print(f"{edge.u} -> {edge.v}")
+    else:
+        print(f"{vertex} es el vertice inicial")
+print(f"\n")
+
+print(f"Recorrido BFS desde el vertice {v1}")
+for vertex, edge in grafo.bfs(v1).items():
+    if edge is not None:
+        print(f"{edge.u} -> {edge.v}")
+    else:
+        print(f"{vertex} es el vertice inicial")
+print(f"\n")
+
 
 print("Los vertices del grafo son :")
 for vertex in grafo.vertices():
